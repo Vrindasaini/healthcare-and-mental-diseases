@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Health Chatbot</title>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      * {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+      }
+
+      body {
+        font-family: "Poppins", sans-serif;
+        background: linear-gradient(135deg, #00b4d8, #0081a7);
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 100vh;
+        padding: 2rem;
+        overflow: hidden;
+      }
+
+      .chat-container {
+        width: 100%;
+        max-width: 600px;
+        background: #ffffff;
+        border-radius: 20px;
+        padding: 1.5rem;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+        display: flex;
+        flex-direction: column;
+        gap: 1rem;
+        animation: fadeIn 1.5s ease-out;
+      }
+
+      @keyframes fadeIn {
+        0% {
+          opacity: 0;
+        }
+        100% {
+          opacity: 1;
+        }
+      }
+
+      .messages {
+        display: flex;
+        flex-direction: column;
+        gap: 1rem;
+        max-height: 500px;
+        overflow-y: auto;
+        margin-bottom: 1rem;
+        padding: 1rem;
+        border-radius: 15px;
+        background-color: #f0f8ff;
+      }
+
+      .bot-message,
+      .user-message {
+        padding: 1rem;
+        border-radius: 15px;
+        max-width: 80%;
+        font-size: 1.1rem;
+        animation: popIn 0.5s ease-out;
+      }
+
+      .bot-message {
+        background-color: #00b4d8;
+        color: white;
+        align-self: flex-start;
+      }
+
+      .user-message {
+        background-color: #e0e0e0;
+        color: #333;
+        align-self: flex-end;
+      }
+
+      input[type="text"] {
+        padding: 1rem;
+        font-size: 1rem;
+        width: calc(100% - 2rem);
+        border-radius: 15px;
+        border: 2px solid #0077b6;
+        outline: none;
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+      }
+
+      input[type="text"]:focus {
+        border-color: #00b4d8;
+      }
+
+      button {
+        padding: 1rem;
+        background-color: #0077b6;
+        color: white;
+        border: none;
+        border-radius: 15px;
+        cursor: pointer;
+        font-size: 1.2rem;
+        transition: background-color 0.3s ease;
+      }
+
+      button:hover {
+        background-color: #00b4d8;
+      }
+
+      .emoji {
+        font-size: 2rem;
+        margin-left: 5px;
+      }
+
+      .sticker {
+        width: 50px;
+        height: 50px;
+        border-radius: 50%;
+        margin-top: 10px;
+        animation: bounce 0.5s ease-in-out infinite;
+      }
+
+      @keyframes bounce {
+        0%,
+        100% {
+          transform: translateY(0);
+        }
+        50% {
+          transform: translateY(-10px);
+        }
+      }
+
+      .sticker:hover {
+        transform: scale(1.1);
+      }
+
+      .back-button {
+        padding: 1rem;
+        background-color: #ff6f61;
+        color: white;
+        border: none;
+        border-radius: 15px;
+        cursor: pointer;
+        font-size: 1.2rem;
+        text-align: center;
+        margin-top: 1rem;
+        transition: background-color 0.3s ease;
+        display: block;
+        width: 100%;
+      }
+
+      .back-button:hover {
+        background-color: #ff8f7d;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="chat-container">
+      <div class="messages" id="messages"></div>
+      <input
+        type="text"
+        id="userInput"
+        placeholder="Ask the bot about your health..."
+      />
+      <button onclick="sendMessage()">Send</button>
+      <button class="back-button" onclick="goBackHome()">Back to Home</button>
+    </div>
+
+    <script>
+      const messages = document.getElementById("messages");
+
+      // Function to handle sending the message
+      function sendMessage() {
+        const userInput = document.getElementById("userInput").value;
+        if (userInput.trim() === "") return;
+
+        addMessage("user", userInput);
+
+        // Simulating the bot's response after 1 second
+        setTimeout(() => {
+          getBotResponse(userInput);
+        }, 1000);
+
+        document.getElementById("userInput").value = ""; // Clear input field
+      }
+
+      // Function to display the user's message
+      function addMessage(sender, text) {
+        const message = document.createElement("div");
+        message.classList.add(
+          sender === "bot" ? "bot-message" : "user-message"
+        );
+        message.innerText = text;
+
+        // Add emojis or stickers based on the message type
+        if (sender === "bot") {
+          if (text.includes("headache")) {
+            message.innerHTML += ` <span class="emoji">🤕</span>`;
+          } else if (text.includes("fever")) {
+            message.innerHTML += ` <span class="emoji">🤒</span>`;
+          } else if (text.includes("cough")) {
+            message.innerHTML += ` <span class="emoji">🤧</span>`;
+          } else if (text.includes("sore throat")) {
+            message.innerHTML += ` <span class="emoji">🗣</span>`;
+          } else if (text.includes("fatigue")) {
+            message.innerHTML += ` <span class="emoji">😴</span>`;
+          } else if (text.includes("nausea")) {
+            message.innerHTML += ` <span class="emoji">🤢</span>`;
+          } else {
+            message.innerHTML += ` <span class="emoji">❓</span>`;
+          }
+        }
+
+        // Adding a sticker for fun (optional)
+        if (sender === "bot") {
+          const sticker = document.createElement("img");
+          sticker.src = "https://via.placeholder.com/50"; // Placeholder for the sticker image
+          sticker.classList.add("sticker");
+          message.appendChild(sticker);
+        }
+
+        messages.appendChild(message);
+        messages.scrollTop = messages.scrollHeight; // Auto scroll to the bottom
+      }
+
+      // Function to generate the bot's response
+      function getBotResponse(userMessage) {
+        const lowerCaseMessage = userMessage.toLowerCase();
+
+        // Simple responses based on symptoms detected in the input
+        let botResponse = "";
+
+        if (lowerCaseMessage.includes("headache")) {
+          botResponse =
+            "It seems like you may be experiencing a headache. Try resting, hydrate yourself, and use a cold compress on your forehead.";
+        } else if (lowerCaseMessage.includes("fever")) {
+          botResponse =
+            "Fever might indicate an infection. Ensure you're hydrated and monitor your temperature. If it persists, consult a doctor.";
+        } else if (lowerCaseMessage.includes("cough")) {
+          botResponse =
+            "Coughing can be caused by a cold or flu. Drink warm fluids, rest, and if symptoms persist, see a doctor.";
+        } else if (lowerCaseMessage.includes("sore throat")) {
+          botResponse =
+            "A sore throat could be due to a viral infection or allergies. Drink warm tea and avoid irritants.";
+        } else if (lowerCaseMessage.includes("fatigue")) {
+          botResponse =
+            "Fatigue could be due to stress, lack of sleep, or a more serious condition. Try to relax and get enough rest.";
+        } else if (lowerCaseMessage.includes("nausea")) {
+          botResponse =
+            "Nausea can occur due to various causes such as indigestion, stress, or infection. Stay hydrated and consider a light diet.";
+        } else {
+          botResponse =
+            "Sorry, I couldn't understand that. Could you please describe your symptoms again?";
+        }
+
+        addMessage("bot", botResponse);
+      }
+
+      // Function to handle the "Back to Home" button
+      function goBackHome() {
+        window.location.href = "index.html"; // Change this to the URL of your home page
+      }
+    </script>
+  </body>
+</html>
