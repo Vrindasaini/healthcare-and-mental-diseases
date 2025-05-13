@@ -1,0 +1,291 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Symptom Checker</title>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      * {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+      }
+
+      body {
+        font-family: "Poppins", sans-serif;
+        background: linear-gradient(135deg, #90caf9, #f48fb1);
+        min-height: 100vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 2rem;
+        animation: fadeIn 1.5s ease;
+      }
+
+      @keyframes fadeIn {
+        from {
+          opacity: 0;
+          transform: translateY(20px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+
+      .container {
+        width: 100%;
+        max-width: 1200px;
+        background: rgba(255, 255, 255, 0.15);
+        backdrop-filter: blur(20px);
+        padding: 4rem;
+        border-radius: 25px;
+        box-shadow: 0 10px 40px rgba(0, 0, 0, 0.25);
+        color: #333;
+      }
+
+      h1 {
+        text-align: center;
+        margin-bottom: 2rem;
+        font-size: 2.8rem;
+        color: #fff;
+        text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.4);
+      }
+
+      .home-link {
+        display: inline-block;
+        margin-bottom: 1.5rem;
+        color: #ffffff;
+        font-weight: 600;
+        text-decoration: none;
+        background-color: rgba(255, 255, 255, 0.2);
+        padding: 0.6rem 1.2rem;
+        border-radius: 10px;
+        transition: all 0.3s ease;
+      }
+
+      .home-link:hover {
+        background-color: #ffffff;
+        color: #0077ff;
+        text-decoration: none;
+      }
+
+      label {
+        display: block;
+        font-weight: 600;
+        margin-top: 1.5rem;
+        margin-bottom: 0.5rem;
+        color: #fff;
+        font-size: 1.1rem;
+      }
+
+      input,
+      select,
+      textarea {
+        width: 100%;
+        padding: 1.2rem;
+        border-radius: 12px;
+        border: none;
+        font-size: 1rem;
+        margin-bottom: 1rem;
+      }
+
+      textarea {
+        resize: vertical;
+      }
+
+      .btn {
+        display: block;
+        width: 100%;
+        padding: 1.2rem;
+        font-size: 1.3rem;
+        font-weight: bold;
+        background: #fff;
+        color: #0077ff;
+        border: none;
+        border-radius: 12px;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        margin-top: 1.2rem;
+      }
+
+      .btn:hover {
+        background: #0077ff;
+        color: white;
+        transform: scale(1.02);
+      }
+
+      .result {
+        background: rgba(255, 255, 255, 0.85);
+        padding: 2rem;
+        border-radius: 15px;
+        margin-top: 2rem;
+        display: none;
+        animation: slideUp 0.6s ease;
+      }
+
+      @keyframes slideUp {
+        from {
+          opacity: 0;
+          transform: translateY(40px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+
+      .result h3 {
+        margin-bottom: 1rem;
+        color: #0077ff;
+      }
+
+      .result p {
+        font-size: 1rem;
+      }
+
+      @media (max-width: 600px) {
+        .container {
+          padding: 2rem 1.2rem;
+        }
+
+        h1 {
+          font-size: 2rem;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <a href="index.html" class="home-link">← Back to Home</a>
+      <h1>🩺 AI Symptom Checker</h1>
+
+      <label for="age">Age</label>
+      <input type="number" id="age" placeholder="Enter your age" />
+
+      <label for="gender">Gender</label>
+      <select id="gender">
+        <option value="">Select</option>
+        <option>Male</option>
+        <option>Female</option>
+        <option>Other</option>
+      </select>
+
+      <label for="bp">Blood Pressure (mmHg)</label>
+      <input type="text" id="bp" placeholder="e.g. 120/80" />
+
+      <label for="sugar">Blood Sugar Level (mg/dL)</label>
+      <input type="number" id="sugar" placeholder="e.g. 95" />
+
+      <label for="symptoms">Describe your symptoms (comma separated)</label>
+      <textarea
+        id="symptoms"
+        rows="5"
+        placeholder="e.g. headache, fever, cough, sore throat..."
+      ></textarea>
+
+      <button class="btn" onclick="checkSymptoms()">Check My Health</button>
+
+      <div class="result" id="resultBox">
+        <h3>🔍 Possible Illness:</h3>
+        <p id="resultText"></p>
+      </div>
+    </div>
+
+    <script>
+      function checkSymptoms() {
+        const symptoms = document
+          .getElementById("symptoms")
+          .value.toLowerCase();
+        const sugar = parseFloat(document.getElementById("sugar").value);
+        const bp = document.getElementById("bp").value.trim();
+        const resultBox = document.getElementById("resultBox");
+        const resultText = document.getElementById("resultText");
+
+        if (!symptoms.trim()) {
+          resultText.innerText = "Please describe your symptoms.";
+          resultBox.style.display = "block";
+          return;
+        }
+
+        const symptomList = symptoms.split(",").map((s) => s.trim());
+        const matchedDiseases = [];
+
+        const diseaseDatabase = {
+          "Common Cold": [
+            "cough",
+            "sore throat",
+            "runny nose",
+            "sneezing",
+            "fatigue",
+          ],
+          Flu: ["fever", "chills", "body ache", "fatigue", "dry cough"],
+          "COVID-19": [
+            "fever",
+            "dry cough",
+            "tiredness",
+            "loss of taste",
+            "difficulty breathing",
+          ],
+          Migraine: ["headache", "nausea", "sensitivity to light", "aura"],
+          "Stomach Infection": [
+            "vomiting",
+            "diarrhea",
+            "abdominal pain",
+            "fever",
+          ],
+          Dengue: ["fever", "rash", "joint pain", "muscle pain", "bleeding"],
+          Typhoid: [
+            "fever",
+            "abdominal pain",
+            "weakness",
+            "loss of appetite",
+            "headache",
+          ],
+        };
+
+        for (let disease in diseaseDatabase) {
+          const common = diseaseDatabase[disease].filter((sym) =>
+            symptomList.includes(sym)
+          );
+          if (common.length >= 2) {
+            matchedDiseases.push(${disease} (matched: ${common.join(", ")}));
+          }
+        }
+
+        if (sugar > 140) {
+          matchedDiseases.push("⚠ Possible High Blood Sugar (Hyperglycemia)");
+        } else if (sugar < 70) {
+          matchedDiseases.push("⚠ Possible Low Blood Sugar (Hypoglycemia)");
+        }
+
+        if (bp) {
+          const [sys, dia] = bp.split("/").map(Number);
+          if (sys > 130 || dia > 80) {
+            matchedDiseases.push(
+              "⚠ Possible High Blood Pressure (Hypertension)"
+            );
+          } else if (sys < 90 || dia < 60) {
+            matchedDiseases.push(
+              "⚠ Possible Low Blood Pressure (Hypotension)"
+            );
+          }
+        }
+
+        if (matchedDiseases.length > 0) {
+          resultText.innerHTML = matchedDiseases
+            .map((d) => ✅ ${d})
+            .join("<br>");
+        } else {
+          resultText.innerText =
+            "No common illness detected. Please consult a medical professional.";
+        }
+
+        resultBox.style.display = "block";
+      }
+    </script> symptom checker
+</html>
